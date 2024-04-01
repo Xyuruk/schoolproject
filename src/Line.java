@@ -72,7 +72,7 @@ public class Line {
         return p;
     }
     public static boolean whichSide(Point a,Line l) {//для рисования первой прямой в случае огда выше нее еще остаются точки
-        if (l.getA() * a.getX() + l.getB() * a.getY() + l.getC() > 0 ) {// если точка выше есть
+        if (l.getA() * a.getX() + l.getB() * a.getY() + l.getC() < 0 ) {// если точка выше есть
             return true;
         } else {
             return false;

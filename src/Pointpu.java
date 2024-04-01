@@ -16,7 +16,6 @@ public class Pointpu extends JPanel implements MouseListener, MouseMotionListene
     public Pointpu() {
         addMouseListener(this);
         addMouseMotionListener(this);
-
     }
     public void mousePressed(MouseEvent e) {
         if(mod.equals("MOUSE_MOD")) {
@@ -53,48 +52,46 @@ public class Pointpu extends JPanel implements MouseListener, MouseMotionListene
     }
 
     @Override
-    public void paint (Graphics g) {
+    public void paint (Graphics graphics) {
 
         int x = -w/100;
         int y = h/100;
-        g.setColor(Color.BLACK);
-        g.drawLine((w / 2), 0, (w / 2), h);
+        graphics.setColor(Color.BLACK);
+        graphics.drawLine((w / 2), 0, (w / 2), h);
         for (int i = 0; i < 1000; i += 50) {
-            g.drawRect((int) ((h / 2) - 7.5), i , 15, 2);
-            g.fillRect((int) ((h / 2) - 7.5), i ,  15 ,2);
+            graphics.drawRect((int) ((h / 2) - 7.5), i , 15, 2);
+            graphics.fillRect((int) ((h / 2) - 7.5), i ,  15 ,2);
             String oy = Integer.toString(y);
-            g.drawString(oy, ((w / 2) + 1), i+1);
+            graphics.drawString(oy, ((w / 2) + 1), i+1);
             y -= 1;
         }
-        g.drawLine(0, (h / 2) + 1, w, (h / 2) + 1);
+        graphics.drawLine(0, (h / 2) + 1, w, (h / 2) + 1);
         for (int j = -1;j < 1000; j += 50) {
-            g.drawRect(j, (int) ((h / 2) - 7.5), 2, 15);
-            g.fillRect(j, (int) ((h / 2) - 7.5), 2, 15);
+            graphics.drawRect(j, (int) ((h / 2) - 7.5), 2, 15);
+            graphics.fillRect(j, (int) ((h / 2) - 7.5), 2, 15);
             String ox = Integer.toString(x);
-            g.drawString(ox, j + 2, w / 2);
+            graphics.drawString(ox, j + 2, w / 2);
             x += 1;
         }
 
 
-
         for (int i = 0; i < mas_points.size(); i++) {
-            g.setColor(Color.RED);
+            graphics.setColor(Color.RED);
             Point pt = mas_points.get(i);
-            g.fillOval((int) (pt.getX() - 2.5), (int) (pt.getY() - 2.5), 5, 5);
-            g.drawOval((int) (pt.getX() - 2.5), (int) (pt.getY() - 2.5), 5, 5);
+            graphics.fillOval((int) (pt.getX() - 2.5), (int) (pt.getY() - 2.5), 5, 5);
+            graphics.drawOval((int) (pt.getX() - 2.5), (int) (pt.getY() - 2.5), 5, 5);
         }
 
 
-        if (mas_points.size() % 10 == 0) { // условный цикл для рисования прямоугольника
+        if (mas_points.size() % 10 == 0 && mas_points.size() > 0) { // условный цикл для рисования прямоугольника
             Line line =  new Line ( findMin2Y().getX(), findMin2Y().getY(), findMinY().getX(), findMinY().getY() );//самая первая
 
-            line = firstLine(mas_points, line); //корректируем если сверху есть точки
+            line = firstLine(mas_points, line, graphics); //корректируем если сверху есть точки
 
-            g.drawLine(findMinY().x, findMinY().y, findMin2Y().x, findMin2Y().y );//рисует первую но потом ее удалиь надо
+            graphics.drawLine(findMinY().x, findMinY().y, findMin2Y().x, findMin2Y().y );//рисует первую но потом ее удалиь надо
 
 
-            Line perpendicuolarTo = Line.rotatedLine(findMinX());//ей пeрпендикулярная
-
+            Line perpendicuolarTo = Line.perpendicularLine(findMinX(), line);//ей пeрпендикулярная
 
 
             Line perpendicuolarToPerpendicular = Line.rotatedLine(findMaxY());
@@ -106,13 +103,13 @@ public class Pointpu extends JPanel implements MouseListener, MouseMotionListene
             MyPoint downright = Line.intersection(line4,  perpendicuolarToPerpendicular);
             MyPoint upright = Line.intersection(line, line4); //странная
 
-            g.drawLine(downleft.getX(), downleft.getY(), upleft.getX(), upleft.getY());//рисуем 4 линии
-            g.drawLine(upleft.getX(), upleft.getY(), upright.getX(), upright.getY());
-            g.drawLine(downright.getX(), downright.getY(), upright.getX(), upright.getY());
-            g.drawLine(downleft.getX(), downleft.getY(), downright.getX(), downright.getY());
+            graphics.drawLine(downleft.getX(), downleft.getY(), upleft.getX(), upleft.getY());//рисуем 4 линии
+//            graphics.drawLine(upleft.getX(), upleft.getY(), upright.getX(), upright.getY());
+//            graphics.drawLine(downright.getX(), downright.getY(), upright.getX(), upright.getY());
+//            graphics.drawLine(downleft.getX(), downleft.getY(), downright.getX(), downright.getY());
 
-            System.out.println("max "+findMinX());//проверка
-            System.out.println(downleft.getX()+" "+downleft.getY()+" "+upleft.getX()+" "+upleft.getY()+" "+downright.getX()+" "+ downright.getY()+" "+upright.getX()+" "+upright.getY());
+//            System.out.println("max "+findMinX());//проверка
+//            System.out.println(downleft.getX()+" "+downleft.getY()+" "+upleft.getX()+" "+upleft.getY()+" "+downright.getX()+" "+ downright.getY()+" "+upright.getX()+" "+upright.getY());
 
             mas_points.clear();
         }
@@ -163,7 +160,7 @@ public class Pointpu extends JPanel implements MouseListener, MouseMotionListene
         }
         return min;
     }
-    Line firstLine(ArrayList<Point> mas_points, Line line){// для рисования первой линии
+    Line firstLine(ArrayList<Point> mas_points, Line line, Graphics g){// для рисования первой линии
         ArrayList<Point> mas_pointsTrue = new ArrayList<>() ;
         for(int i = 0; i < mas_points.size();  i++) {
             if (Line.whichSide(mas_points.get(i), line)) {
@@ -172,12 +169,19 @@ public class Pointpu extends JPanel implements MouseListener, MouseMotionListene
                 line = new Line( findMin2Y().getX(), findMin2Y().getY(), findMinY().getX(), findMinY().getY());//самая первая
             }
         }
+
+//        //TESTING
+//        for (Point point : mas_pointsTrue) {
+//            g.setColor(Color.GREEN);;
+//            g.fillOval((int) (point.getX() - 2.5), (int) (point.getY() - 2.5), 5, 5);
+//            g.drawOval((int) (point.getX() - 2.5), (int) (point.getY() - 2.5), 5, 5);
+//        }
+        double maxDistance = 0 ;
         for(int j = 0; j < mas_pointsTrue.size();  j++) {
-            double maxdistance = 0 ;
-            if( maxdistance < MyPoint.distanceToPoint(mas_pointsTrue.get(j), line)){
-                maxdistance = MyPoint.distanceToPoint(mas_pointsTrue.get(j), line);
+            if( maxDistance < MyPoint.distanceToPoint(mas_pointsTrue.get(j), line)){
+                maxDistance = MyPoint.distanceToPoint(mas_pointsTrue.get(j), line);
             }
-            if (maxdistance == MyPoint.distanceToPoint(mas_pointsTrue.get(j), line)){
+            if (maxDistance == MyPoint.distanceToPoint(mas_pointsTrue.get(j), line)){
                 line = new Line(mas_pointsTrue.get(j).getX(), mas_pointsTrue.get(j).getY(),findMinY().getX(), findMinY().getY() );
             }
         }
