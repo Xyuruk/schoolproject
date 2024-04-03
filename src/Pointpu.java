@@ -1,11 +1,10 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-
+import java.util.Comparator;
 
 
 public class Pointpu extends JPanel implements MouseListener, MouseMotionListener  {
@@ -86,10 +85,9 @@ public class Pointpu extends JPanel implements MouseListener, MouseMotionListene
         if (mas_points.size() % 10 == 0 && mas_points.size() > 0) { // условный цикл для рисования прямоугольника
             Line line =  new Line ( findMin2Y().getX(), findMin2Y().getY(), findMinY().getX(), findMinY().getY() );//самая первая
 
-            line = firstLine(mas_points, line, graphics); //корректируем если сверху есть точки
+            Point point = getPointForFirstLine(mas_points, line, graphics); //корректируем если сверху есть точки
 
-            graphics.drawLine(findMinY().x, findMinY().y, findMin2Y().x, findMin2Y().y );//рисует первую но потом ее удалиь надо
-
+            graphics.drawLine(findMinY().x, findMinY().y, point.x, point.y);//рисует первую но потом ее удалиь надо
 
             Line perpendicuolarTo = Line.perpendicularLine(findMinX(), line);//ей пeрпендикулярная
 
@@ -115,58 +113,44 @@ public class Pointpu extends JPanel implements MouseListener, MouseMotionListene
         }
     }
     Point findMaxX(){
-        Point max =mas_points.get(0);
-        for(int i = 0; i < mas_points.size(); i ++){
-            if(mas_points.get(i).getX() > max.getX()){
-                max = mas_points.get(i);
-            }
-        }
-        return max;
+        return mas_points.stream()
+                .sorted(Comparator.comparing(Point::getX).reversed())
+                .findFirst()
+                .get();
     }
 
     Point findMaxY(){
-        Point max = mas_points.get(0);
-        for(int i = 0; i < mas_points.size(); i ++){
-            if(mas_points.get(i).getY() > max.getY()){
-                max = mas_points.get(i);
-            }
-        }
-        return max;
+        return mas_points.stream()
+                .sorted(Comparator.comparing(Point::getY).reversed())
+                .findFirst()
+                .get();
     }
     Point findMinX(){
-        Point min = mas_points.get(0);
-        for(int i = 0; i < mas_points.size(); i ++){
-            if(mas_points.get(i).getX() < min.getX()){
-                min = mas_points.get(i);
-            }
-        }
-        return min;
+        return mas_points.stream()
+                .sorted(Comparator.comparing(Point::getX))
+                .findFirst()
+                .get();
     }
     Point findMinY(){
-        Point min = mas_points.get(0);
-        for(int i = 0; i < mas_points.size(); i ++){
-            if(mas_points.get(i).getY() < min.getY()){
-                min = mas_points.get(i);
-            }
-        }
-        return min;
+        return mas_points.stream()
+                .sorted(Comparator.comparing(Point::getY))
+                .findFirst()
+                .get();
     }
     Point findMin2Y(){
-        Point min = mas_points.get(0);
-        for(int i = 0; i < mas_points.size(); i ++){
-            if(mas_points.get(i).getY() < min.getY() && mas_points.get(i).getY() > findMinY().getY() ){
-                min = mas_points.get(i);
-            }
-        }
-        return min;
+        return mas_points.stream()
+                .sorted(Comparator.comparing(Point::getY))
+                .toList()
+                .get(1);
     }
-    Line firstLine(ArrayList<Point> mas_points, Line line, Graphics g){// для рисования первой линии
+    Point getPointForFirstLine(ArrayList<Point> mas_points, Line line, Graphics g){// для рисования первой линии
         ArrayList<Point> mas_pointsTrue = new ArrayList<>() ;
+        Point point = null;
         for(int i = 0; i < mas_points.size();  i++) {
-            if (Line.whichSide(mas_points.get(i), line)) {
+            if (Line.isUpSide(mas_points.get(i), line)) {
                 mas_pointsTrue.add(mas_points.get(i));
             } else {
-                line = new Line( findMin2Y().getX(), findMin2Y().getY(), findMinY().getX(), findMinY().getY());//самая первая
+                point = new Point((int) Math.round(findMin2Y().getX()), (int) Math.round(findMin2Y().getY()));//самая первая
             }
         }
 
@@ -177,15 +161,19 @@ public class Pointpu extends JPanel implements MouseListener, MouseMotionListene
 //            g.drawOval((int) (point.getX() - 2.5), (int) (point.getY() - 2.5), 5, 5);
 //        }
         double maxDistance = 0 ;
+        Point maxDistancePoint = null;
         for(int j = 0; j < mas_pointsTrue.size();  j++) {
             if( maxDistance < MyPoint.distanceToPoint(mas_pointsTrue.get(j), line)){
                 maxDistance = MyPoint.distanceToPoint(mas_pointsTrue.get(j), line);
+                maxDistancePoint = mas_pointsTrue.get(j);
             }
-            if (maxDistance == MyPoint.distanceToPoint(mas_pointsTrue.get(j), line)){
-                line = new Line(mas_pointsTrue.get(j).getX(), mas_pointsTrue.get(j).getY(),findMinY().getX(), findMinY().getY() );
-            }
+
         }
-        return line;
+        if (maxDistancePoint != null) {
+            point = new Point((int) Math.round(maxDistancePoint.getX()), (int) Math.round(maxDistancePoint.getY()));
+        }
+
+        return point;
     }
     public static void  getSquare(){
         double square = 0;
