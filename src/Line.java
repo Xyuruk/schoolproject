@@ -1,4 +1,5 @@
 import java.awt.*;
+import java.util.ArrayList;
 
 public class Line {
     double A, B, C;
@@ -43,14 +44,14 @@ public class Line {
         this.C = C;
     }
 
-//    public ArrayList<Point> get2Points() {
-//        Point p1 = new Point(1, ((int) Math.round((-A * 1 - C) / B)));
-//        Point p2 = new Point(-1, ((int) Math.round((-A * (-1) - C) / B)));
-//        ArrayList<Point> points = new ArrayList<>();
-//        points.add(p1);
-//        points.add(p2);
-//        return points;
-//    }
+    public ArrayList<Point> get2Points() {
+        Point p1 = new Point(1, ((int) Math.round((-A * 1 - C) / B)));
+        Point p2 = new Point(-1, ((int) Math.round((-A * (-1) - C) / B)));
+        ArrayList<Point> points = new ArrayList<>();
+        points.add(p1);
+        points.add(p2);
+        return points;
+    }
 
 
 
@@ -74,14 +75,21 @@ public class Line {
         Line l = new Line(x11,y11,x22,y22);
         return l;
     }
-    public static MyPoint intersection(Line l1, Line l2){//right
+    public static MyPoint intersection(Line l1, Line l2){
         MyPoint p =  new MyPoint();
-        p.setX((int)((l1.getB()*l2.getC()-l2.getB()*l1.getC())/(l1.getA()*l2.getB() - l1.getB()*l1.getA()))) ;
+        p.setX((int)((l1.getB()*l2.getC()-l2.getB()*l1.getC())/(l1.getA()*l2.getB() - l1.getB()*l2.getA()))) ;
         p.setY((int)((l1.getC()*l2.getA()-l2.getC()*l1.getA())/(l1.getA()*l2.getB() - l1.getB()*l2.getA()))) ;
         return p;
     }
     public static boolean isUpSide(Point a, Line l) {//для рисования первой прямой в случае огда выше нее еще остаются точки
         if (l.getA() * a.getX() + l.getB() * a.getY() + l.getC() <= 0 ) {// если точка выше есть
+            return true;
+        } else {
+            return false;
+        }
+    }
+    public static boolean isDownSide(Point a, Line l) {//для рисования первой прямой в случае огда ниже нее еще остаются точки
+        if (l.getA() * a.getX() + l.getB() * a.getY() + l.getC() >= 0 ) {// если точка ниже есть
             return true;
         } else {
             return false;
