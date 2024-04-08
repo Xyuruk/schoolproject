@@ -60,33 +60,7 @@ public class RectanglePaint extends JPanel implements MouseListener, MouseMotion
     @Override
     public void paint(Graphics graphics) {
         super.paint(graphics);
-        int x = -w/100;
-        int y = h/100;
-        graphics.setColor(Color.BLACK);
-        graphics.drawLine((w / 2), 0, (w / 2), h);
-        for (int i = 0; i < 1000; i += 50) {
-            graphics.drawRect((int) ((h / 2) - 7.5), i , 15, 2);
-            graphics.fillRect((int) ((h / 2) - 7.5), i ,  15 ,2);
-            String oy = Integer.toString(y);
-            graphics.drawString(oy, ((w / 2) + 1), i+1);
-            y -= 1;
-        }
-        graphics.drawLine(0, (h / 2) + 1, w, (h / 2) + 1);
-        for (int j = -1;j < 1000; j += 50) {
-            graphics.drawRect(j, (int) ((h / 2) - 7.5), 2, 15);
-            graphics.fillRect(j, (int) ((h / 2) - 7.5), 2, 15);
-            String ox = Integer.toString(x);
-            graphics.drawString(ox, j + 2, w / 2);
-            x += 1;
-        }
-
-
-        for (int i = 0; i < points.size(); i++) {
-            graphics.setColor(Color.RED);
-            Point pt = points.get(i);
-            graphics.fillOval((int) (pt.getX() - 2.5), (int) (pt.getY() - 2.5), 5, 5);
-            graphics.drawOval((int) (pt.getX() - 2.5), (int) (pt.getY() - 2.5), 5, 5);
-        }
+        drawSystemCoordinates(graphics);
 
         // Рисуем прямоугольник
         if (points.size() % 10 == 0 && points.size() > 0) {
@@ -153,6 +127,37 @@ public class RectanglePaint extends JPanel implements MouseListener, MouseMotion
             points.clear();
         }
     }
+
+    private void drawSystemCoordinates(Graphics graphics) {
+        int x = -w/100;
+        int y = h/100;
+        graphics.setColor(Color.BLACK);
+        graphics.drawLine((w / 2), 0, (w / 2), h);
+        for (int i = 0; i < 1000; i += 50) {
+            graphics.drawRect((int) ((h / 2) - 7.5), i , 15, 2);
+            graphics.fillRect((int) ((h / 2) - 7.5), i ,  15 ,2);
+            String oy = Integer.toString(y);
+            graphics.drawString(oy, ((w / 2) + 1), i+1);
+            y -= 1;
+        }
+        graphics.drawLine(0, (h / 2) + 1, w, (h / 2) + 1);
+        for (int j = -1;j < 1000; j += 50) {
+            graphics.drawRect(j, (int) ((h / 2) - 7.5), 2, 15);
+            graphics.fillRect(j, (int) ((h / 2) - 7.5), 2, 15);
+            String ox = Integer.toString(x);
+            graphics.drawString(ox, j + 2, w / 2);
+            x += 1;
+        }
+
+
+        for (int i = 0; i < points.size(); i++) {
+            graphics.setColor(Color.RED);
+            Point pt = points.get(i);
+            graphics.fillOval((int) (pt.getX() - 2.5), (int) (pt.getY() - 2.5), 5, 5);
+            graphics.drawOval((int) (pt.getX() - 2.5), (int) (pt.getY() - 2.5), 5, 5);
+        }
+    }
+
     Point findMaxX(){
         return points.stream().max(Comparator.comparing(Point::getX))
                 .get();
