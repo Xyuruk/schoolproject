@@ -1,5 +1,4 @@
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 
@@ -16,7 +15,7 @@ public class Main extends JFrame {
             points.add(point);
         }
         for (MyPoint point : points) {
-            System.out.println("x = " + point.getX() + " y = " + point.getY());
+            System.out.println("x = " + point.x + " y = " + point.y);
         }
         setVisible(true);
         setSize(w, h);
@@ -26,10 +25,12 @@ public class Main extends JFrame {
        JMenuBar menuBar = new JMenuBar(); // coздание меню
         menuBar.add(chooseMenu());
         this.setJMenuBar(menuBar);
-        add(new Pointpu());
+        add(new RectanglePaint());
 
 
     }
+
+
     public JMenu chooseMenu(){
         JMenu jmenu = new JMenu("Выбрать");
         JMenuItem keyboard = new JMenuItem("Клавиатура");
@@ -56,7 +57,7 @@ public class Main extends JFrame {
 
     }
     void answering(ActionEvent activeEvent){
-        Pointpu.getSquare();
+        RectanglePaint.getSquare();
     }
     void readFile(ActionEvent activeEvent){
 
