@@ -63,7 +63,7 @@ public class RectanglePaint extends JPanel implements MouseListener, MouseMotion
         drawSystemCoordinates(graphics);
 
         // Рисуем прямоугольник
-        if (points.size() % 10 == 0 && points.size() > 0) {
+        if (points.size() == 10) {
             Point pointMinY = findMinY();
             Point pointPreMinY = findMin2Y();
 
@@ -76,49 +76,48 @@ public class RectanglePaint extends JPanel implements MouseListener, MouseMotion
             ArrayList<Point>  p =  upperLine.get2Points();
             graphics.drawLine(p.get(0).x, p.get(0).y, p.get(1).x, p.get(1).y);
 
+            // Получение нижней прямой
+            Line downLine = getMostRemoteParallelLine(points, upperLine);
+            p =  downLine.get2Points();
+            graphics.drawLine(p.get(0).x, p.get(0).y, p.get(1).x, p.get(1).y);
 
-            //Point point = getPointForRightLine(mas_points, line, graphics, (int) Math.round(findMin2Y().getX()), (int) Math.round(findMin2Y().getY()));// right point
+            // Получение левой прямой
+            // TODO пока что не работает правильно
+            Line leftLine = Line.perpendicularLine(findMinX(), upperLine);
+            p =  leftLine.get2Points();
+            graphics.drawLine(p.get(0).x, p.get(0).y, p.get(1).x, p.get(1).y);
 
 
-
-//            graphics.drawLine(findMinY().x, findMinY().y, point.x, point.y);//рисует первую уже правильную
+//            Line perpendicuolarToPerpendicular = Line.perpendicularLine(findMaxY(),perpendicuolarTo );
+//            Line perpendicuolarToPerpendicularRight = Line.parallelLine(findMaxY(),perpendicuolarTo );
 //
-//            Line downLine = getMostRemoteParallelLine(mas_points, upperLine);
-
-
-           /* Line perpendicuolarTo = Line.perpendicularLine(findMinX(), upperLine);//ей пeрпендикулярная
-
-
-            Line perpendicuolarToPerpendicular = Line.perpendicularLine(findMaxY(),perpendicuolarTo );
-            Line perpendicuolarToPerpendicularRight = Line.parallelLine(findMaxY(),perpendicuolarTo );
-
-            Line line4 = Line.perpendicularLine(findMaxX(),upperLine );
-
-
-            MyPoint downleft = Line.intersection( perpendicuolarToPerpendicular, perpendicuolarTo);//странная
-            MyPoint upleft = Line.intersection(upperLine, perpendicuolarTo);
-
-            MyPoint downright = Line.intersection(line4,  perpendicuolarToPerpendicular);
-            MyPoint upright = Line.intersection(upperLine, line4);
-
-            graphics.setColor(Color.cyan);
-            graphics.fillOval((int) (downleft.getX() - 2.5), (int) (downleft.getY() - 2.5), 5, 5);
-            graphics.drawOval((int) (downleft.getX() - 2.5), (int) (downleft.getY() - 2.5), 5, 5);
-            graphics.setColor(Color.ORANGE);
-            graphics.fillOval((int) (upleft.getX() - 2.5), (int) (upleft.getY() - 2.5), 5, 5);
-            graphics.drawOval((int) (upleft.getX() - 2.5), (int) (upleft.getY() - 2.5), 5, 5);
-            graphics.setColor(Color.MAGENTA);
-            graphics.fillOval((int) (downright.getX() - 2.5), (int) (downright.getY() - 2.5), 5, 5);
-            graphics.drawOval((int) (downright.getX() - 2.5), (int) (downright.getY() - 2.5), 5, 5);
-            graphics.setColor(Color.green);
-            graphics.fillOval((int) (upright.getX() - 2.5), (int) (upright.getY() - 2.5), 5, 5);
-            graphics.drawOval((int) (upright.getX() - 2.5), (int) (upright.getY() - 2.5), 5, 5);
-
-
-            graphics.drawLine(downleft.getX(), downleft.getY(), upleft.getX(), upleft.getY());//левая
-            graphics.drawLine(upleft.getX(), upleft.getY(), upright.getX(), upright.getY());//повторяет первую
-            graphics.drawLine(downright.getX(), downright.getY(), upright.getX(), upright.getY());
-            graphics.drawLine(downleft.getX(), downleft.getY(), downright.getX(), downright.getY());*/
+//            Line line4 = Line.perpendicularLine(findMaxX(),upperLine );
+//
+//
+//            MyPoint downleft = Line.intersection( perpendicuolarToPerpendicular, perpendicuolarTo);//странная
+//            MyPoint upleft = Line.intersection(upperLine, perpendicuolarTo);
+//
+//            MyPoint downright = Line.intersection(line4,  perpendicuolarToPerpendicular);
+//            MyPoint upright = Line.intersection(upperLine, line4);
+//
+//            graphics.setColor(Color.cyan);
+//            graphics.fillOval((int) (downleft.getX() - 2.5), (int) (downleft.getY() - 2.5), 5, 5);
+//            graphics.drawOval((int) (downleft.getX() - 2.5), (int) (downleft.getY() - 2.5), 5, 5);
+//            graphics.setColor(Color.ORANGE);
+//            graphics.fillOval((int) (upleft.getX() - 2.5), (int) (upleft.getY() - 2.5), 5, 5);
+//            graphics.drawOval((int) (upleft.getX() - 2.5), (int) (upleft.getY() - 2.5), 5, 5);
+//            graphics.setColor(Color.MAGENTA);
+//            graphics.fillOval((int) (downright.getX() - 2.5), (int) (downright.getY() - 2.5), 5, 5);
+//            graphics.drawOval((int) (downright.getX() - 2.5), (int) (downright.getY() - 2.5), 5, 5);
+//            graphics.setColor(Color.green);
+//            graphics.fillOval((int) (upright.getX() - 2.5), (int) (upright.getY() - 2.5), 5, 5);
+//            graphics.drawOval((int) (upright.getX() - 2.5), (int) (upright.getY() - 2.5), 5, 5);
+//
+//
+//            graphics.drawLine(downleft.getX(), downleft.getY(), upleft.getX(), upleft.getY());//левая
+//            graphics.drawLine(upleft.getX(), upleft.getY(), upright.getX(), upright.getY());//повторяет первую
+//            graphics.drawLine(downright.getX(), downright.getY(), upright.getX(), upright.getY());
+//            graphics.drawLine(downleft.getX(), downleft.getY(), downright.getX(), downright.getY());*/
 
 
 
