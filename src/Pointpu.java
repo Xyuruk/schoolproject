@@ -85,12 +85,17 @@ public class Pointpu extends JPanel implements MouseListener, MouseMotionListene
         if (mas_points.size() % 10 == 0 && mas_points.size() > 0) { // условный цикл для рисования прямоугольника
             Line line =  new Line ( findMin2Y().getX(), findMin2Y().getY(), findMinY().getX(), findMinY().getY() );//самая первая
             Point point = getPointForRightLine(mas_points, line, graphics, (int) Math.round(findMin2Y().getX()), (int) Math.round(findMin2Y().getY()));// right point
-            Line firstLine = getRightLine(mas_points, line, (int) Math.round(findMin2Y().getX()), (int) Math.round(findMin2Y().getY()), (int) Math.round(findMinY().getX()), (int) Math.round(findMinY().getY()), null); // right line
+            Line firstLine = getRightLine(mas_points, line, (int) Math.round(findMin2Y().getX()), (int) Math.round(findMin2Y().getY()), (int) Math.round(findMinY().getX()), (int) Math.round(findMinY().getY())); // right line
 
 
             graphics.drawLine(findMinY().x, findMinY().y, point.x, point.y);//рисует первую уже правильную
 
-            Line perpendicuolarTo = Line.perpendicularLine(findMinX(), firstLine);//ей пeрпендикулярная
+            Line downLine = getMostRemoteParallelLine(mas_points, firstLine);
+            ArrayList<Point> p =  downLine.get2Points();
+            graphics.drawLine(p.get(0).x, p.get(0).y, p.get(1).x, p.get(1).y );
+
+
+           /* Line perpendicuolarTo = Line.perpendicularLine(findMinX(), firstLine);//ей пeрпендикулярная
 
 
             Line perpendicuolarToPerpendicular = Line.perpendicularLine(findMaxY(),perpendicuolarTo );
@@ -122,7 +127,7 @@ public class Pointpu extends JPanel implements MouseListener, MouseMotionListene
             graphics.drawLine(downleft.getX(), downleft.getY(), upleft.getX(), upleft.getY());//левая
             graphics.drawLine(upleft.getX(), upleft.getY(), upright.getX(), upright.getY());//повторяет первую
             graphics.drawLine(downright.getX(), downright.getY(), upright.getX(), upright.getY());
-            graphics.drawLine(downleft.getX(), downleft.getY(), downright.getX(), downright.getY());
+            graphics.drawLine(downleft.getX(), downleft.getY(), downright.getX(), downright.getY());*/
 
 
 
@@ -194,7 +199,7 @@ public class Pointpu extends JPanel implements MouseListener, MouseMotionListene
 
         return point;
     }
-    Line getRightLine(ArrayList<Point> mas_points, Line line, int xBefore, int yBefore, int xRight, int yRight, Point po){// для рисования первой линии
+    Line getRightLine(ArrayList<Point> mas_points, Line line, int xBefore, int yBefore, int xRight, int yRight){// для рисования первой линии
         ArrayList<Point> mas_pointsTrue = new ArrayList<>() ;
         Point point = null;
         Line firstLine = null;
@@ -219,33 +224,24 @@ public class Pointpu extends JPanel implements MouseListener, MouseMotionListene
             point = new Point((int) Math.round(maxDistancePoint.getX()), (int) Math.round(maxDistancePoint.getY()));
             firstLine = new Line (point.x, point.y, xRight, yRight);
         }
-        if(xRight != findMinY().x){
-            Line r = firstLine;
-            firstLine = Line.parallelLine( po, r );
-        }
+
 
         return firstLine;
     }
-    Line getRightLineForAll(ArrayList<Point> mas_points, Line line) {// для рисования первой линии
-        ArrayList<Point> mas_pointsTrue = new ArrayList<>();
-        Point point = null;
-        Line firstLine = null;
-        for (int i = 0; i < mas_points.size(); i++) {
-            if ((Line.isUpSide(mas_points.get(i), line) && line.A > 0) || (Line.isDownSide(mas_points.get(i), line) && line.A < 0)) {//корявое
-                mas_pointsTrue.add(mas_points.get(i));
-            }
-        }
+    Line getMostRemoteParallelLine(ArrayList<Point> mas_points, Line line) {// для рисования первой линии
+        Line lineParall = null;
         double maxDistance = 0;
         Point maxDistancePoint = null;
-        for (int j = 0; j < mas_pointsTrue.size(); j++) {
-            if (maxDistance < MyPoint.distanceToPoint(mas_pointsTrue.get(j), line)) {
-                maxDistance = MyPoint.distanceToPoint(mas_pointsTrue.get(j), line);
-                maxDistancePoint = mas_pointsTrue.get(j);
+        for (Point point: mas_points) {
+            if (maxDistance < MyPoint.distanceToPoint(point, line)) {
+                maxDistance = MyPoint.distanceToPoint(point, line);
+                maxDistancePoint = point;
             }
         }
-        Line lineRight = Line.parallelLine(maxDistancePoint, firstLine);
-        return lineRight;
+        lineParall = Line.parallelLine(maxDistancePoint, line);
+        return lineParall;
     }
+
     public static void  getSquare(){
         double square = 0;
         JOptionPane.showMessageDialog(null, square);

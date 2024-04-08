@@ -45,8 +45,10 @@ public class Line {
     }
 
     public ArrayList<Point> get2Points() {
-        Point p1 = new Point(1, ((int) Math.round((-A * 1 - C) / B)));
-        Point p2 = new Point(-1, ((int) Math.round((-A * (-1) - C) / B)));
+        final int x = 100;
+        final int x1 =600;
+        Point p1 = new Point(x, ((int) Math.round((-A * x - C) / B)));
+        Point p2 = new Point(x1, ((int) Math.round((-A * (x1) - C) / B)));
         ArrayList<Point> points = new ArrayList<>();
         points.add(p1);
         points.add(p2);
