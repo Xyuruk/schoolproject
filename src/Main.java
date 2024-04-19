@@ -1,28 +1,15 @@
 import javax.swing.*;
 import java.awt.event.ActionEvent;
-import java.util.ArrayList;
 
 public class Main extends JFrame {
     int w = 1000, h = 1000;
     Main(){
-        ArrayList<MyPoint> points = new ArrayList<>();
-        ArrayList<String> lines = FileReader.readFileContents("points");
-        for (String line : lines) {
-            String[] coordinates = line.split(" ");
-            int x = Integer.parseInt(coordinates[0]);
-            int y = Integer.parseInt(coordinates[1]);
-            MyPoint point = new MyPoint(x, y);
-            points.add(point);
-        }
-        for (MyPoint point : points) {
-            System.out.println("x = " + point.x + " y = " + point.y);
-        }
         setVisible(true);
         setSize(w, h);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
 
-       JMenuBar menuBar = new JMenuBar(); // coздание меню
+        JMenuBar menuBar = new JMenuBar(); // coздание меню
         menuBar.add(chooseMenu());
         this.setJMenuBar(menuBar);
         add(new RectanglePaint());
@@ -33,14 +20,17 @@ public class Main extends JFrame {
 
     public JMenu chooseMenu(){
         JMenu jmenu = new JMenu("Выбрать");
+
         JMenuItem keyboard = new JMenuItem("Клавиатура");
         jmenu.add(keyboard);
         jmenu.add(new JSeparator());
         keyboard.addActionListener(this::readKeyboard);
+
         JMenuItem mouse = new JMenuItem("Мышка");
         jmenu.add(mouse);
         jmenu.add(new JSeparator());
         mouse.addActionListener(this::readMouse);
+
         JMenuItem file = new JMenuItem("Файл");
         jmenu.add(file);
         file.addActionListener(this::readFile);
@@ -62,13 +52,15 @@ public class Main extends JFrame {
 
     }
     void draw(ActionEvent activeEvent){
-        RectanglePaint.paint();
+        RectanglePaint.isPressed = true;
+        repaint();
     }
     void answering(ActionEvent activeEvent){
         RectanglePaint.getSquare(RectanglePaint.downleft, RectanglePaint.upleft, RectanglePaint.upright);
     }
     void readFile(ActionEvent activeEvent){
-
+        RectanglePaint.mode = InputMode.FILE_MODE;
+        repaint();
     }
     void readKeyboard(ActionEvent activeEvent){
 

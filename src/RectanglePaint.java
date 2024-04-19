@@ -12,7 +12,7 @@ public class RectanglePaint extends JPanel implements MouseListener, MouseMotion
     ArrayList<Point> points = new ArrayList<>();
     final int h = 1000;
     final int w = 1000;
-     static MyPoint downleft;
+    static MyPoint downleft;
     static MyPoint upleft;
     static MyPoint downright;
     static MyPoint upright;
@@ -20,7 +20,7 @@ public class RectanglePaint extends JPanel implements MouseListener, MouseMotion
 
 
 
-    InputMode mode = InputMode.MOUSE_MODE;
+    public static InputMode mode = InputMode.MOUSE_MODE;
     public RectanglePaint() {
         addMouseListener(this);
         addMouseMotionListener(this);
@@ -32,8 +32,10 @@ public class RectanglePaint extends JPanel implements MouseListener, MouseMotion
                 repaint();
                 System.out.println(e.getPoint());
             }
-            //TODO
-            case FILE_MODE -> throw new RuntimeException("FILE_MODE not completed.");
+            case FILE_MODE -> {
+                points.addAll(FileReader.getPointsFromFile("points.txt"));
+                repaint();
+            }
             default -> throw new RuntimeException("Mode is not supported.");
         }
     }
@@ -67,6 +69,9 @@ public class RectanglePaint extends JPanel implements MouseListener, MouseMotion
     @Override
     public void paint(Graphics graphics) {
         super.paint(graphics);
+        if (mode == InputMode.FILE_MODE && points.isEmpty()) {
+            points.addAll(FileReader.getPointsFromFile("points.txt"));
+        }
         drawSystemCoordinates(graphics);
 
         // Рисуем прямоугольник
@@ -96,7 +101,7 @@ public class RectanglePaint extends JPanel implements MouseListener, MouseMotion
             Line leftLine = Line.parallelLine(maxD,mostRemoteRightLine );
 
 
-           downleft = Line.intersection(downLine, leftLine);//странная
+            downleft = Line.intersection(downLine, leftLine);//странная
             upleft = Line.intersection( upperLine, leftLine);
 
             downright = Line.intersection(downLine, mostRemoteRightLine);
@@ -111,7 +116,7 @@ public class RectanglePaint extends JPanel implements MouseListener, MouseMotion
 
 
 
-
+            isPressed = false;
             points.clear();
         }
     }
