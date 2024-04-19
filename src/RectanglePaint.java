@@ -12,6 +12,13 @@ public class RectanglePaint extends JPanel implements MouseListener, MouseMotion
     ArrayList<Point> points = new ArrayList<>();
     final int h = 1000;
     final int w = 1000;
+     static MyPoint downleft;
+    static MyPoint upleft;
+    static MyPoint downright;
+    static MyPoint upright;
+    static boolean isPressed = false;
+
+
 
     InputMode mode = InputMode.MOUSE_MODE;
     public RectanglePaint() {
@@ -63,7 +70,7 @@ public class RectanglePaint extends JPanel implements MouseListener, MouseMotion
         drawSystemCoordinates(graphics);
 
         // Рисуем прямоугольник
-        if (points.size() == 10) {
+        if (isPressed)  {
             Point pointMinY = findMinY();
             Point pointPreMinY = findMin2Y();
 
@@ -73,51 +80,33 @@ public class RectanglePaint extends JPanel implements MouseListener, MouseMotion
             // Получение верной верхней прямой
             Line upperLine = getRightLine(points, line, pointMinY); // right line
 
-            ArrayList<Point>  p =  upperLine.get2Points();
-            graphics.drawLine(p.get(0).x, p.get(0).y, p.get(1).x, p.get(1).y);
+
 
             // Получение нижней прямой
             Line downLine = getMostRemoteParallelLine(points, upperLine);
-            p =  downLine.get2Points();
-            graphics.drawLine(p.get(0).x, p.get(0).y, p.get(1).x, p.get(1).y);
+
 
             // Получение левой прямой
-            // TODO пока что не работает правильно
-            Line leftLine = Line.perpendicularLine(findMinX(), upperLine);
-            p =  leftLine.get2Points();
-            graphics.drawLine(p.get(0).x, p.get(0).y, p.get(1).x, p.get(1).y);
+            Line rightLine = Line.perpendicularLine(findMaxX(), upperLine);
+            Line mostRemoteRightLine = getParallelForRightLine(points, rightLine);
 
 
-//            Line perpendicuolarToPerpendicular = Line.perpendicularLine(findMaxY(),perpendicuolarTo );
-//            Line perpendicuolarToPerpendicularRight = Line.parallelLine(findMaxY(),perpendicuolarTo );
-//
-//            Line line4 = Line.perpendicularLine(findMaxX(),upperLine );
-//
-//
-//            MyPoint downleft = Line.intersection( perpendicuolarToPerpendicular, perpendicuolarTo);//странная
-//            MyPoint upleft = Line.intersection(upperLine, perpendicuolarTo);
-//
-//            MyPoint downright = Line.intersection(line4,  perpendicuolarToPerpendicular);
-//            MyPoint upright = Line.intersection(upperLine, line4);
-//
-//            graphics.setColor(Color.cyan);
-//            graphics.fillOval((int) (downleft.getX() - 2.5), (int) (downleft.getY() - 2.5), 5, 5);
-//            graphics.drawOval((int) (downleft.getX() - 2.5), (int) (downleft.getY() - 2.5), 5, 5);
-//            graphics.setColor(Color.ORANGE);
-//            graphics.fillOval((int) (upleft.getX() - 2.5), (int) (upleft.getY() - 2.5), 5, 5);
-//            graphics.drawOval((int) (upleft.getX() - 2.5), (int) (upleft.getY() - 2.5), 5, 5);
-//            graphics.setColor(Color.MAGENTA);
-//            graphics.fillOval((int) (downright.getX() - 2.5), (int) (downright.getY() - 2.5), 5, 5);
-//            graphics.drawOval((int) (downright.getX() - 2.5), (int) (downright.getY() - 2.5), 5, 5);
-//            graphics.setColor(Color.green);
-//            graphics.fillOval((int) (upright.getX() - 2.5), (int) (upright.getY() - 2.5), 5, 5);
-//            graphics.drawOval((int) (upright.getX() - 2.5), (int) (upright.getY() - 2.5), 5, 5);
-//
-//
-//            graphics.drawLine(downleft.getX(), downleft.getY(), upleft.getX(), upleft.getY());//левая
-//            graphics.drawLine(upleft.getX(), upleft.getY(), upright.getX(), upright.getY());//повторяет первую
-//            graphics.drawLine(downright.getX(), downright.getY(), upright.getX(), upright.getY());
-//            graphics.drawLine(downleft.getX(), downleft.getY(), downright.getX(), downright.getY());*/
+            // Получение правой прямой
+            Point maxD = getMaxDistance(mostRemoteRightLine);
+            Line leftLine = Line.parallelLine(maxD,mostRemoteRightLine );
+
+
+           downleft = Line.intersection(downLine, leftLine);//странная
+            upleft = Line.intersection( upperLine, leftLine);
+
+            downright = Line.intersection(downLine, mostRemoteRightLine);
+            upright = Line.intersection(upperLine,mostRemoteRightLine);
+
+            graphics.drawLine((int)upright.x, (int)upright.y , (int)upleft.x, (int)upleft.y);
+            graphics.drawLine((int)downleft.x, (int)downleft.y, (int)upleft.x, (int)upleft.y);
+            graphics.drawLine((int)downleft.x, (int)downleft.y, (int)downright.x, (int)downright.y);
+            graphics.drawLine((int)upright.x, (int)upright.y , (int)downright.x, (int)downright.y);
+
 
 
 
@@ -148,26 +137,17 @@ public class RectanglePaint extends JPanel implements MouseListener, MouseMotion
             x += 1;
         }
 
-
         for (int i = 0; i < points.size(); i++) {
             graphics.setColor(Color.RED);
             Point pt = points.get(i);
             graphics.fillOval((int) (pt.getX() - 2.5), (int) (pt.getY() - 2.5), 5, 5);
             graphics.drawOval((int) (pt.getX() - 2.5), (int) (pt.getY() - 2.5), 5, 5);
         }
+
     }
 
     Point findMaxX(){
         return points.stream().max(Comparator.comparing(Point::getX))
-                .get();
-    }
-
-    Point findMaxY(){
-        return points.stream().max(Comparator.comparing(Point::getY))
-                .get();
-    }
-    Point findMinX(){
-        return points.stream().min(Comparator.comparing(Point::getX))
                 .get();
     }
     Point findMinY(){
@@ -180,39 +160,6 @@ public class RectanglePaint extends JPanel implements MouseListener, MouseMotion
                 .toList()
                 .get(1);
     }
-//    Point getPointForRightLine(ArrayList<Point> mas_points, Line line, Graphics g, int xNorm, int yNorm){// для рисования первой линии
-//        ArrayList<Point> mas_pointsTrue = new ArrayList<>() ;
-//        Point point = null;
-//        for(int i = 0; i < mas_points.size();  i++) {
-//            if (Line.isUpSide(mas_points.get(i), line)) {
-//                mas_pointsTrue.add(mas_points.get(i));
-//            } else {
-//                point = new Point(xNorm,yNorm);//самая первая
-//            }
-//        }
-//
-////TESTING
-//           /*  for (Point pointr : mas_pointsTrue) {
-//            g.setColor(Color.PINK);;
-//            g.fillOval((int) (pointr.getX() - 2.5), (int) (pointr.getY() - 2.5), 5, 5);
-//            g.drawOval((int) (pointr.getX() - 2.5), (int) (pointr.getY() - 2.5), 5, 5);
-//        }*/
-//        double maxDistance = 0 ;
-//        Point maxDistancePoint = null;
-//        for(int j = 0; j < mas_pointsTrue.size();  j++) {
-//            if( maxDistance < MyPoint.distanceToPoint(mas_pointsTrue.get(j), line)){
-//                maxDistance = MyPoint.distanceToPoint(mas_pointsTrue.get(j), line);
-//                maxDistancePoint = mas_pointsTrue.get(j);
-//            }
-//
-//        }
-//        if (maxDistancePoint != null) {
-//            point = new Point((int) Math.round(maxDistancePoint.getX()), (int) Math.round(maxDistancePoint.getY()));
-//        }
-//
-//        return point;
-//    }
-
     // Получаем верную верхнюю линию
     Line getRightLine(ArrayList<Point> points, Line preliminaryLine, Point pointMinY) {
         double maxDistance = 0;
@@ -246,13 +193,51 @@ public class RectanglePaint extends JPanel implements MouseListener, MouseMotion
                 maxDistancePoint = point;
             }
         }
+        if(maxDistancePoint == null){
+            return line;
+        }
         lineParall = Line.parallelLine(maxDistancePoint, line);
         return lineParall;
     }
+    Line getParallelForRightLine(ArrayList<Point> mas_points, Line line) {
+        ArrayList<Point> masPointsTrue = new ArrayList<>();
+        Point point = null;
+        for (int i = 0; i < mas_points.size(); i++) {
+            if ((GeometryTool.isUpSide(mas_points.get(i), line) && line.A < 0) || (GeometryTool.isDownSide(mas_points.get(i), line) && line.A > 0)) {//корявое
+                masPointsTrue.add(mas_points.get(i));
+            }
+        }
+        double maxDistance = 0;
+        Point maxDistancePoint = null;
+        for (int j = 0; j < masPointsTrue.size(); j++) {
+            if (maxDistance < GeometryTool.distanceBetweenPointAndLine(masPointsTrue.get(j), line)) {
+                maxDistance = GeometryTool.distanceBetweenPointAndLine(masPointsTrue.get(j), line);
+                maxDistancePoint = masPointsTrue.get(j);
+            }
+        }
+        if(maxDistancePoint == null){
+            return line;
+        }
+        Line lineLeft = Line.parallelLine(maxDistancePoint, line);
+        return lineLeft;
+    }
+    Point getMaxDistance (Line line){
+    double maxDistance = 0;
+        Point maxDistancePoint = null;
+        for (int j = 0; j < points.size(); j++) {
+            if (maxDistance < GeometryTool.distanceBetweenPointAndLine( points.get(j), line)) {
+                maxDistance = GeometryTool.distanceBetweenPointAndLine( points.get(j), line);
+                maxDistancePoint =  points.get(j);
+            }
+        }
+        return  maxDistancePoint;
+    }
 
-    public static void  getSquare(){
-        double square = 0;
-        JOptionPane.showMessageDialog(null, square);
+    public static void  getSquare(MyPoint p1, MyPoint p2, MyPoint p3){
+        double a = Math.sqrt(((p2.x - p1.x) * (p2.x - p1.x)) + ((p2.y - p1.y) * (p2.y - p1.y)));
+        double b = Math.sqrt(((p2.x - p3.x) * (p2.x - p3.x)) + ((p2.y - p3.y) * (p2.y - p3.y)));
+        double square = a*b;
+        JOptionPane.showMessageDialog(null, "Площадь данного прямоугольника равна: "+ Math.round(square));
 
     }
 }

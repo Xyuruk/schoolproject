@@ -50,14 +50,22 @@ public class Main extends JFrame {
         jmenu.add(new JSeparator());
         answer.addActionListener(this::answering);
 
+        JMenuItem draw = new JMenuItem("Нарисовать прямоугольник");
+        jmenu.add(draw);
+        jmenu.add(new JSeparator());
+        draw.addActionListener(this::draw);
+
         jmenu.setLocation(0,0);
         return jmenu;
     }
     void readMouse(ActionEvent activeEvent){
 
     }
+    void draw(ActionEvent activeEvent){
+        RectanglePaint.paint();
+    }
     void answering(ActionEvent activeEvent){
-        RectanglePaint.getSquare();
+        RectanglePaint.getSquare(RectanglePaint.downleft, RectanglePaint.upleft, RectanglePaint.upright);
     }
     void readFile(ActionEvent activeEvent){
 

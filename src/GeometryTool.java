@@ -7,12 +7,9 @@ public class GeometryTool {
     public static boolean isUpSide(Point point, Line line) {
         return line.getA() * point.getX() + line.getB() * point.getY() + line.getC() > 0;
     }
-
-    // Получить линию перпендикулярную текущей через точку
-    public static Line perpendicularLine(Point p, Line line){ //right
-        return new Line((-1)*line.getB(), line.getA(), (p.getX()*line.getB())-(p.getY()*line.getA()));
+    public static boolean isDownSide(Point a, Line l) {//для рисования первой прямой в случае огда ниже нее еще остаются точки
+            return l.getA() * a.getX() + l.getB() * a.getY() + l.getC() >= 0;// если точка ниже есть
     }
-
     // Получить расстояние между точкой и прямой
     public static double distanceBetweenPointAndLine(Point p, Line line) {
         return Math.abs((line.A * p.x + line.B * p.y + line.C) / Math.sqrt(line.A*line.A + line.B*line.B));
