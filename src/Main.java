@@ -1,8 +1,9 @@
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 
 public class Main extends JFrame {
-    int w = 1000, h = 1000;
+    int w = 800, h = 750;
     Main(){
         setVisible(true);
         setSize(w, h);
@@ -13,8 +14,6 @@ public class Main extends JFrame {
         menuBar.add(chooseMenu());
         this.setJMenuBar(menuBar);
         add(new RectanglePaint());
-
-
     }
 
 
@@ -34,6 +33,7 @@ public class Main extends JFrame {
         JMenuItem file = new JMenuItem("Файл");
         jmenu.add(file);
         file.addActionListener(this::readFile);
+        jmenu.add(new JSeparator());
 
         JMenuItem answer = new JMenuItem("Вывести ответ");
         jmenu.add(answer);
@@ -42,7 +42,6 @@ public class Main extends JFrame {
 
         JMenuItem draw = new JMenuItem("Нарисовать прямоугольник");
         jmenu.add(draw);
-        jmenu.add(new JSeparator());
         draw.addActionListener(this::draw);
 
         jmenu.setLocation(0,0);
@@ -63,7 +62,8 @@ public class Main extends JFrame {
         repaint();
     }
     void readKeyboard(ActionEvent activeEvent){
-
+        RectanglePaint.mode = InputMode.KEYBOARD_MODE;
+        repaint();
     }
     public static void main (String[] args){
         new Main().setVisible(true);

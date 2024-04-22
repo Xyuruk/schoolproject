@@ -9,31 +9,31 @@ import java.util.Optional;
 
 
 public class RectanglePaint extends JPanel implements MouseListener, MouseMotionListener  {
-    ArrayList<Point> points = new ArrayList<>();
-    final int h = 1000;
-    final int w = 1000;
+    public static ArrayList<Point> points = new ArrayList<>();
     static MyPoint downleft;
     static MyPoint upleft;
     static MyPoint downright;
     static MyPoint upright;
     static boolean isPressed = false;
-
-
-
     public static InputMode mode = InputMode.MOUSE_MODE;
     public RectanglePaint() {
         addMouseListener(this);
         addMouseMotionListener(this);
     }
+    @Override
     public void mousePressed(MouseEvent e) {
         switch (mode) {
             case MOUSE_MODE -> {
                 points.add(new Point(e.getPoint()));
                 repaint();
-                System.out.println(e.getPoint());
+                //System.out.println(e.getPoint());
             }
             case FILE_MODE -> {
                 points.addAll(FileReader.getPointsFromFile("points.txt"));
+                repaint();
+            }
+            case KEYBOARD_MODE -> {
+                points.addAll(KeyboardReader.getPointsFromKeyboard());
                 repaint();
             }
             default -> throw new RuntimeException("Mode is not supported.");
@@ -75,7 +75,7 @@ public class RectanglePaint extends JPanel implements MouseListener, MouseMotion
         drawSystemCoordinates(graphics);
 
         // Рисуем прямоугольник
-        if (isPressed)  {
+        if (isPressed && points.size()>2)  {
             Point pointMinY = findMinY();
             Point pointPreMinY = findMin2Y();
 
@@ -85,68 +85,67 @@ public class RectanglePaint extends JPanel implements MouseListener, MouseMotion
             // Получение верной верхней прямой
             Line upperLine = getRightLine(points, line, pointMinY); // right line
 
-
-
             // Получение нижней прямой
             Line downLine = getMostRemoteParallelLine(points, upperLine);
-
 
             // Получение левой прямой
             Line rightLine = Line.perpendicularLine(findMaxX(), upperLine);
             Line mostRemoteRightLine = getParallelForRightLine(points, rightLine);
 
-
             // Получение правой прямой
             Point maxD = getMaxDistance(mostRemoteRightLine);
             Line leftLine = Line.parallelLine(maxD,mostRemoteRightLine );
 
-
-            downleft = Line.intersection(downLine, leftLine);//странная
+            // получение точек пересечения получившихся прямых для возможности их нарисовать
+            downleft = Line.intersection(downLine, leftLine);
             upleft = Line.intersection( upperLine, leftLine);
-
             downright = Line.intersection(downLine, mostRemoteRightLine);
             upright = Line.intersection(upperLine,mostRemoteRightLine);
 
+            // рисуем 4 линии
             graphics.drawLine((int)upright.x, (int)upright.y , (int)upleft.x, (int)upleft.y);
             graphics.drawLine((int)downleft.x, (int)downleft.y, (int)upleft.x, (int)upleft.y);
             graphics.drawLine((int)downleft.x, (int)downleft.y, (int)downright.x, (int)downright.y);
             graphics.drawLine((int)upright.x, (int)upright.y , (int)downright.x, (int)downright.y);
 
-
-
-
-
+            //очищаем список точек для возможности следующего ввода
             isPressed = false;
             points.clear();
+        } else if (isPressed && points.size()==2){
+            JOptionPane.showMessageDialog(null, "Вы задали всего 2 точки, невозможно нарисовать прямоугольник");
+            points.clear();
+            isPressed = false;
+        } else if (isPressed && points.size()==1){
+            JOptionPane.showMessageDialog(null, "Вы задали всего 1 точку, невозможно нарисовать прямоугольник");
+            points.clear();
+            isPressed = false;
+        } else if (isPressed && points.size()==0){
+            JOptionPane.showMessageDialog(null, "Вы не задали точки, невозможно нарисовать прямоугольник");
         }
     }
-
-    private void drawSystemCoordinates(Graphics graphics) {
-        int x = -w/100;
-        int y = h/100;
-        graphics.setColor(Color.BLACK);
-        graphics.drawLine((w / 2), 0, (w / 2), h);
-        for (int i = 0; i < 1000; i += 50) {
-            graphics.drawRect((int) ((h / 2) - 7.5), i , 15, 2);
-            graphics.fillRect((int) ((h / 2) - 7.5), i ,  15 ,2);
-            String oy = Integer.toString(y);
-            graphics.drawString(oy, ((w / 2) + 1), i+1);
-            y -= 1;
+    private void drawSystemCoordinates(Graphics g) {
+        g.setColor(Color.BLACK);
+        int w = getWidth();
+        int h = getHeight();
+        g.drawLine(0, h / 2, w, h / 2);
+        g.drawLine(w / 2, h, w / 2, 0);
+        for(int i = 0; i < w / 100; i++) {
+            g.drawLine(w / 2 + i * 50, h / 2 - 5, w / 2 + i * 50, h / 2 +5);
+            g.drawString("" + i * 50, w / 2 + i * 50, h / 2 + 11);
+            g.drawLine(w / 2 - i * 50, h / 2 - 5, w / 2 - i * 50, h / 2 + 5);
+            g.drawString("" + - i * 50, w / 2 - i * 50, h / 2 + 11);
         }
-        graphics.drawLine(0, (h / 2) + 1, w, (h / 2) + 1);
-        for (int j = -1;j < 1000; j += 50) {
-            graphics.drawRect(j, (int) ((h / 2) - 7.5), 2, 15);
-            graphics.fillRect(j, (int) ((h / 2) - 7.5), 2, 15);
-            String ox = Integer.toString(x);
-            graphics.drawString(ox, j + 2, w / 2);
-            x += 1;
+        for(int i = 0; i < h / 100; i++) {
+            g.drawLine(w / 2 - 5, h / 2 + i * 50, w / 2 + 5, h / 2 + i * 50);
+            g.drawString("" + -i * 50, w / 2 - 30, h / 2 + i * 50);
+            g.drawLine(w / 2 - 5, h / 2 - i * 50, w / 2 + 5, h / 2 - i * 50);
+            g.drawString("" + i * 50, w / 2 - 30, h / 2 - i * 50);
         }
-
         for (int i = 0; i < points.size(); i++) {
-            graphics.setColor(Color.RED);
+            g.setColor(Color.RED);
             Point pt = points.get(i);
-            graphics.fillOval((int) (pt.getX() - 2.5), (int) (pt.getY() - 2.5), 5, 5);
-            graphics.drawOval((int) (pt.getX() - 2.5), (int) (pt.getY() - 2.5), 5, 5);
+            g.fillOval((int) (pt.getX() - 2.5), (int) (pt.getY() - 2.5), 5, 5);
+            g.drawOval((int) (pt.getX() - 2.5), (int) (pt.getY() - 2.5), 5, 5);
         }
 
     }
@@ -159,7 +158,7 @@ public class RectanglePaint extends JPanel implements MouseListener, MouseMotion
         return points.stream().min(Comparator.comparing(Point::getY))
                 .get();
     }
-    Point findMin2Y(){
+    Point findMin2Y(){ // нахождение преминимума
         return points.stream()
                 .sorted(Comparator.comparing(Point::getY))
                 .toList()
@@ -178,17 +177,15 @@ public class RectanglePaint extends JPanel implements MouseListener, MouseMotion
                     maxDistance = distance;
                     maxDistancePoint = Optional.of(point);
                 }
-
             }
         }
         // Если нашлась новая точка, то возвращаем новую прямую
         // Если нет, то возвращаем исходную
         return maxDistancePoint.map(point -> new Line(pointMinY, point)).orElse(preliminaryLine);
     }
-
-
+    //находим наиболее удаленную от данной прямой прямую
     Line getMostRemoteParallelLine(ArrayList<Point> mas_points, Line line) {
-        Line lineParall = null;
+        Line lineParall;
         double maxDistance = 0;
         Point maxDistancePoint = null;
         for (Point point: mas_points) {
@@ -206,7 +203,6 @@ public class RectanglePaint extends JPanel implements MouseListener, MouseMotion
     }
     Line getParallelForRightLine(ArrayList<Point> mas_points, Line line) {
         ArrayList<Point> masPointsTrue = new ArrayList<>();
-        Point point = null;
         for (int i = 0; i < mas_points.size(); i++) {
             if ((GeometryTool.isUpSide(mas_points.get(i), line) && line.A < 0) || (GeometryTool.isDownSide(mas_points.get(i), line) && line.A > 0)) {//корявое
                 masPointsTrue.add(mas_points.get(i));
@@ -245,6 +241,8 @@ public class RectanglePaint extends JPanel implements MouseListener, MouseMotion
         JOptionPane.showMessageDialog(null, "Площадь данного прямоугольника равна: "+ Math.round(square));
 
     }
+    //Функция переводит экранные координаты в реальные
+
 }
 
 
