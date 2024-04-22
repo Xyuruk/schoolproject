@@ -33,7 +33,7 @@ public class RectanglePaint extends JPanel implements MouseListener, MouseMotion
                 repaint();
             }
             case KEYBOARD_MODE -> {
-                points.addAll(KeyboardReader.getPointsFromKeyboard());
+                points.add(KeyboardReader.getPointsFromKeyboard());
                 repaint();
             }
             default -> throw new RuntimeException("Mode is not supported.");

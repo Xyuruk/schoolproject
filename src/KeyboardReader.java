@@ -43,20 +43,20 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 
-public class KeyboardReader extends RectanglePaint {
-    public static RectanglePaint RectanglePaint;
+public class KeyboardReader {
     public KeyboardReader(){
     }
-    public static ArrayList<Point> getPointsFromKeyboard(){
+
+
+    public static Point getPointsFromKeyboard(){
         String string = JOptionPane.showInputDialog(null,"Введите координаты точки через пробел");
+
         if (string != null){
             String[] coordinates = string.split(" ");
             int x = Integer.parseInt(coordinates[0]);
             int y = Integer.parseInt(coordinates[1]);
-            points.add(new Point(x,y));
-            System.out.println(points);
-            System.out.println(string);
+            return new Point(x,y);
         }
-        return points;
+        throw new RuntimeException("Null point");
     }
 }

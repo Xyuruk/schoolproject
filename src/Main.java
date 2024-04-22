@@ -48,7 +48,7 @@ public class Main extends JFrame {
         return jmenu;
     }
     void readMouse(ActionEvent activeEvent){
-
+        RectanglePaint.mode = InputMode.MOUSE_MODE;
     }
     void draw(ActionEvent activeEvent){
         RectanglePaint.isPressed = true;
